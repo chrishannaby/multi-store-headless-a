@@ -4,16 +4,26 @@ import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
 import {CartMain} from '~/components/Cart';
+import {StoreSwitcher} from './StoreSwitcher';
 import {
   PredictiveSearchForm,
   PredictiveSearchResults,
 } from '~/components/Search';
 
-export function Layout({cart, children = null, footer, header, isLoggedIn}) {
+export function Layout({
+  cart,
+  children = null,
+  footer,
+  header,
+  isLoggedIn,
+  stores,
+  currentStore,
+}) {
   return (
     <>
       <CartAside cart={cart} />
       <SearchAside />
+      <StoreSwitcher stores={stores} currentStore={currentStore} cart={cart} />
       <MobileMenuAside menu={header.menu} />
       <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />
       <main>{children}</main>

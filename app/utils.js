@@ -1,6 +1,8 @@
 import {useLocation} from '@remix-run/react';
 import {useMemo} from 'react';
 
+export const isDev = process.env.NODE_ENV === 'development';
+
 export function useVariantUrl(handle, selectedOptions) {
   const {pathname} = useLocation();
 

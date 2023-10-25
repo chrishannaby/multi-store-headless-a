@@ -17,6 +17,20 @@ import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
 import {Layout} from '~/components/Layout';
 import tailwindCss from './styles/tailwind.css';
+import {isDev} from './utils';
+
+const stores = [
+  {
+    name: 'Brand A',
+    id: 1,
+    domain: isDev ? 'localhost:3000' : 'www.chrishannaby-store-a.com',
+  },
+  {
+    name: 'Brand B',
+    id: 2,
+    domain: isDev ? 'localhost:3001' : 'www.chrishannaby-store-b.com',
+  },
+];
 
 // This is important to avoid re-fetching root queries on sub-navigations
 export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
@@ -50,10 +64,20 @@ export function links() {
   ];
 }
 
-export async function loader({context}) {
+export async function loader({context, request}) {
   const {storefront, session, cart} = context;
   const customerAccessToken = await session.get('customerAccessToken');
-  const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
+
+  const cartId = new URL(request.url).searchParams.get('cartId');
+  if (cartId) {
+    await cart.setCartId(cartId);
+  }
+
+  const currentStore = stores.find(
+    (store) => store.domain === request.headers.get('host'),
+  );
+
+  const publicStoreDomain = currentStore.domain;
 
   // validate the customer access token is valid
   const {isLoggedIn, headers} = await validateCustomerAccessToken(
@@ -87,6 +111,8 @@ export async function loader({context}) {
       header: await headerPromise,
       isLoggedIn,
       publicStoreDomain,
+      stores,
+      currentStore,
     },
     {headers},
   );
