@@ -73,6 +73,7 @@ export async function loader({context, request}) {
   console.log('cartId', cartId);
   if (cartId) {
     await cart.setCartId(cartId);
+    console.log('cart', await cart.get());
   }
 
   const currentStore = stores.find(
