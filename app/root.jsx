@@ -68,6 +68,7 @@ export async function loader({context, request}) {
   const {storefront, session, cart} = context;
   const customerAccessToken = await session.get('customerAccessToken');
 
+  console.log('request.url', request.url);
   const cartId = new URL(request.url).searchParams.get('cartId');
   console.log('cartId', cartId);
   if (cartId) {
