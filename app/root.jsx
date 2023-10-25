@@ -69,6 +69,7 @@ export async function loader({context, request}) {
   const customerAccessToken = await session.get('customerAccessToken');
 
   const cartId = new URL(request.url).searchParams.get('cartId');
+  console.log('cartId', cartId);
   if (cartId) {
     await cart.setCartId(cartId);
   }
@@ -76,6 +77,7 @@ export async function loader({context, request}) {
   const currentStore = stores.find(
     (store) => store.domain === request.headers.get('host'),
   );
+  console.log('currentStore', currentStore);
 
   const publicStoreDomain = currentStore.domain;
 
