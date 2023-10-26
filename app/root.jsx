@@ -1,5 +1,5 @@
 import {useNonce} from '@shopify/hydrogen';
-import {defer} from '@shopify/remix-oxygen';
+import {defer, redirect} from '@shopify/remix-oxygen';
 import {
   Links,
   Meta,
@@ -23,12 +23,12 @@ const stores = [
   {
     name: 'Brand A',
     id: 1,
-    domain: isDev ? 'localhost:3000' : 'www.chrishannaby-store-a.com',
+    domain: isDev ? 'storea.com' : 'www.chrishannaby-store-a.com',
   },
   {
     name: 'Brand B',
     id: 2,
-    domain: isDev ? 'localhost:3001' : 'www.chrishannaby-store-b.com',
+    domain: isDev ? 'storeb.com' : 'www.chrishannaby-store-b.com',
   },
 ];
 
@@ -68,18 +68,18 @@ export async function loader({context, request}) {
   const {storefront, session, cart} = context;
   const customerAccessToken = await session.get('customerAccessToken');
 
-  console.log('request.url', request.url);
   const cartId = new URL(request.url).searchParams.get('cartId');
-  console.log('cartId', cartId);
   if (cartId) {
-    await cart.setCartId(cartId);
-    console.log('cart', await cart.get());
+    const headers = cart.setCartId(cartId);
+    // redirect to remove the cartId query param from the url but maintain other params
+    const url = new URL(request.url);
+    url.searchParams.delete('cartId');
+    return redirect(url.toString(), {headers});
   }
 
   const currentStore = stores.find(
     (store) => store.domain === request.headers.get('host'),
   );
-  console.log('currentStore', currentStore);
 
   const publicStoreDomain = currentStore.domain;
 
@@ -90,7 +90,8 @@ export async function loader({context, request}) {
   );
 
   // defer the cart query by not awaiting it
-  const cartPromise = cart.get();
+  const cartPromise = await cart.get();
+  console.log('cartPromise', cartPromise);
 
   // defer the footer query (below the fold)
   const footerPromise = storefront.query(FOOTER_QUERY, {
