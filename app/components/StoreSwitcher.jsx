@@ -28,7 +28,7 @@ function Nav({stores, currentStore, cart}) {
 
 export function StoreSwitcher({stores, currentStore, cart}) {
   return (
-    <div>
+    <div className="p-4">
       <Suspense
         fallback={
           <Nav stores={stores} currentStore={currentStore} cart={null} />
